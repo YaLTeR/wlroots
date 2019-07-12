@@ -412,6 +412,10 @@ static int config_ini_handler(void *user, const char *section, const char *name,
 				free(mode);
 				wlr_log(WLR_ERROR, "Invalid modeline: %s", value);
 			}
+		} else if (strcmp(name, "repaint-delay") == 0) {
+			oc->repaint_delay_msec = strtol(value, NULL, 10);
+			wlr_log(WLR_DEBUG, "Set output %s repaint-delay to %d msec",
+					oc->name, oc->repaint_delay_msec);
 		}
 	} else if (strncmp(cursor_prefix, section, strlen(cursor_prefix)) == 0) {
 		const char *seat_name = section + strlen(cursor_prefix);

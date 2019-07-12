@@ -529,6 +529,7 @@ static void output_destroy(struct roots_output *output) {
 	wl_list_remove(&output->present.link);
 	wl_list_remove(&output->damage_frame.link);
 	wl_list_remove(&output->damage_destroy.link);
+	wl_event_source_remove(output->repaint_timer);
 	free(output);
 }
 
@@ -544,11 +545,24 @@ static void output_handle_enable(struct wl_listener *listener, void *data) {
 	update_output_manager_config(output->desktop);
 }
 
+static int output_repaint_timer_handler(void *data) {
+	struct roots_output *output = data;
+	output_render(output);
+
+	return 0;
+}
+
 static void output_damage_handle_frame(struct wl_listener *listener,
 		void *data) {
 	struct roots_output *output =
 		wl_container_of(listener, output, damage_frame);
-	output_render(output);
+
+	if (output->repaint_delay_msec > 0) {
+		wl_event_source_timer_update(output->repaint_timer,
+				output->repaint_delay_msec);
+	} else {
+		output_repaint_timer_handler(output);
+	}
 }
 
 static void output_damage_handle_destroy(struct wl_listener *listener,
@@ -639,6 +653,9 @@ void handle_new_output(struct wl_listener *listener, void *data) {
 		wl_list_init(&output->layers[i]);
 	}
 
+	output->repaint_timer = wl_event_loop_add_timer(server.wl_event_loop,
+			output_repaint_timer_handler, output);
+
 	struct roots_output_config *output_config =
 		roots_config_get_output(config, wlr_output);
 
@@ -665,6 +682,8 @@ void handle_new_output(struct wl_listener *listener, void *data) {
 			wlr_output_set_transform(wlr_output, output_config->transform);
 			wlr_output_layout_add(desktop->layout, wlr_output, output_config->x,
 				output_config->y);
+
+			output->repaint_delay_msec = output_config->repaint_delay_msec;
 		} else {
 			wlr_output_enable(wlr_output, false);
 		}

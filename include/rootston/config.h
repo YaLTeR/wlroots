@@ -25,6 +25,7 @@ struct roots_output_config {
 		float refresh_rate;
 	} mode;
 	struct wl_list modes;
+	int repaint_delay_msec;
 };
 
 struct roots_device_config {

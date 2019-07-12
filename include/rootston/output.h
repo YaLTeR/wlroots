@@ -21,6 +21,9 @@ struct roots_output {
 
 	struct wlr_box usable_area;
 
+	struct wl_event_source *repaint_timer;
+	int repaint_delay_msec;
+
 	struct wl_listener destroy;
 	struct wl_listener enable;
 	struct wl_listener mode;
