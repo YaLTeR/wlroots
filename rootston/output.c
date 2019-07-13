@@ -12,6 +12,7 @@
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/util/log.h>
 #include <wlr/util/region.h>
+#include <wlr/util/timeline.h>
 #include "rootston/config.h"
 #include "rootston/layers.h"
 #include "rootston/output.h"
@@ -547,6 +548,10 @@ static void output_handle_enable(struct wl_listener *listener, void *data) {
 
 static int output_repaint_timer_handler(void *data) {
 	struct roots_output *output = data;
+
+	TL_POINT("output_repaint_timer_handler", TLP_OUTPUT(output->wlr_output),
+			TLP_END);
+
 	output_render(output);
 
 	return 0;

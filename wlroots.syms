@@ -4,6 +4,10 @@
 		_wlr_log;
 		_wlr_vlog;
 		_wlr_strip_path;
+		weston_timeline_enabled_;
+		weston_timeline_open;
+		weston_timeline_close;
+		weston_timeline_point;
 	local:
 		wlr_signal_emit_safe;
 		*;

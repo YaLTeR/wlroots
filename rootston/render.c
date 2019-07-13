@@ -10,6 +10,7 @@
 #include <wlr/types/wlr_linux_dmabuf_v1.h>
 #include <wlr/util/log.h>
 #include <wlr/util/region.h>
+#include <wlr/util/timeline.h>
 #include "rootston/layers.h"
 #include "rootston/output.h"
 #include "rootston/server.h"
@@ -86,6 +87,8 @@ static void render_surface_iterator(struct roots_output *output,
 	if (!texture) {
 		return;
 	}
+
+	TL_POINT("render surface", TLP_SURFACE(surface), TLP_OUTPUT(output->wlr_output), TLP_END);
 
 	struct wlr_box box = *_box;
 	scale_box(&box, wlr_output->scale);
@@ -419,4 +422,7 @@ buffer_damage_finish:
 send_frame_done:
 	// Send frame done events to all surfaces
 	output_for_each_surface(output, surface_send_frame_done_iterator, &now);
+
+	TL_POINT("output_render after send frame", TLP_OUTPUT(wlr_output),
+			TLP_END);
 }

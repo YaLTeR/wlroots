@@ -20,6 +20,7 @@
 #include <wlr/render/wlr_renderer.h>
 #include <wlr/types/wlr_matrix.h>
 #include <wlr/util/log.h>
+#include <wlr/util/timeline.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include "backend/drm/drm.h"
@@ -1419,6 +1420,8 @@ static void page_flip_handler(int fd, unsigned seq,
 		.flags = present_flags,
 	};
 	wlr_output_send_present(&conn->output, &present_event);
+
+	TL_POINT("page flip", TLP_OUTPUT(&conn->output), TLP_VBLANK(&present_time), TLP_END);
 
 	if (drm->session->active) {
 		wlr_output_send_frame(&conn->output);

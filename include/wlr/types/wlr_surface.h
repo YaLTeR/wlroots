@@ -15,6 +15,7 @@
 #include <time.h>
 #include <wayland-server.h>
 #include <wlr/types/wlr_output.h>
+#include <wlr/util/timeline-object.h>
 
 enum wlr_surface_state_field {
 	WLR_SURFACE_STATE_BUFFER = 1 << 0,
@@ -112,6 +113,8 @@ struct wlr_surface {
 	struct wl_listener renderer_destroy;
 
 	void *data;
+
+	struct weston_timeline_object timeline_object;
 };
 
 struct wlr_subsurface_state {

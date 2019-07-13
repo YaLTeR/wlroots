@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <wlr/util/log.h>
+#include <wlr/util/timeline.h>
 #include "rootston/bindings.h"
 #include "rootston/view.h"
 
@@ -103,6 +104,12 @@ void execute_binding_command(struct roots_seat *seat,
 		struct roots_seat *seat;
 		wl_list_for_each(seat, list, link) {
 			roots_cursor_constrain(seat->cursor, NULL, NAN, NAN);
+		}
+	} else if (strcmp(command, "toggle_timeline") == 0) {
+		if (weston_timeline_enabled_) {
+			weston_timeline_close();
+		} else {
+			weston_timeline_open();
 		}
 	} else {
 		wlr_log(WLR_ERROR, "unknown binding command: %s", command);

@@ -16,6 +16,7 @@
 #include <wayland-util.h>
 #include <wlr/render/dmabuf.h>
 #include <wlr/types/wlr_buffer.h>
+#include <wlr/util/timeline-object.h>
 
 struct wlr_output_mode {
 	uint32_t flags; // enum wl_output_mode
@@ -146,6 +147,8 @@ struct wlr_output {
 	struct wl_listener display_destroy;
 
 	void *data;
+
+	struct weston_timeline_object timeline_object;
 };
 
 struct wlr_output_event_precommit {

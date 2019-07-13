@@ -10,6 +10,7 @@
 #include <wlr/types/wlr_output.h>
 #include <wlr/util/log.h>
 #include <wlr/util/region.h>
+#include <wlr/util/timeline.h>
 #include "util/signal.h"
 
 #define CALLBACK_VERSION 1
@@ -343,6 +344,7 @@ static void surface_commit_pending(struct wlr_surface *surface) {
 
 	surface->sx += surface->pending.dx;
 	surface->sy += surface->pending.dy;
+	TL_POINT("apply damage", TLP_SURFACE(surface), TLP_END);
 	surface_update_damage(&surface->buffer_damage,
 		&surface->current, &surface->pending);
 
