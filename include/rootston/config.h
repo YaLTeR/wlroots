@@ -26,6 +26,7 @@ struct roots_output_config {
 	} mode;
 	struct wl_list modes;
 	int repaint_delay_msec;
+	int frame_delay_msec;
 };
 
 struct roots_device_config {

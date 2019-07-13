@@ -416,6 +416,10 @@ static int config_ini_handler(void *user, const char *section, const char *name,
 			oc->repaint_delay_msec = strtol(value, NULL, 10);
 			wlr_log(WLR_DEBUG, "Set output %s repaint-delay to %d msec",
 					oc->name, oc->repaint_delay_msec);
+		} else if (strcmp(name, "frame-delay") == 0) {
+			oc->frame_delay_msec = strtol(value, NULL, 10);
+			wlr_log(WLR_DEBUG, "Set output %s frame-delay to %d msec",
+					oc->name, oc->frame_delay_msec);
 		}
 	} else if (strncmp(cursor_prefix, section, strlen(cursor_prefix)) == 0) {
 		const char *seat_name = section + strlen(cursor_prefix);

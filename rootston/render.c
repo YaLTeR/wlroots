@@ -250,7 +250,7 @@ static bool scan_out_fullscreen_view(struct roots_output *output) {
 	return wlr_output_commit(wlr_output);
 }
 
-static void surface_send_frame_done_iterator(struct roots_output *output,
+void surface_send_frame_done_iterator(struct roots_output *output,
 		struct wlr_surface *surface, struct wlr_box *box, float rotation,
 		void *data) {
 	struct timespec *when = data;
@@ -420,8 +420,10 @@ buffer_damage_finish:
 	pixman_region32_fini(&buffer_damage);
 
 send_frame_done:
-	// Send frame done events to all surfaces
-	output_for_each_surface(output, surface_send_frame_done_iterator, &now);
+	if (output->frame_delay_msec == 0) {
+		// Send frame done events to all surfaces
+		output_for_each_surface(output, surface_send_frame_done_iterator, &now);
+	}
 
 	wlr_output->block_idle_frame = false;
 

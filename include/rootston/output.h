@@ -23,6 +23,8 @@ struct roots_output {
 
 	struct wl_event_source *repaint_timer;
 	int repaint_delay_msec;
+	struct wl_event_source *frame_timer;
+	int frame_delay_msec;
 
 	struct wl_listener destroy;
 	struct wl_listener enable;

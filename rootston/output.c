@@ -531,6 +531,7 @@ static void output_destroy(struct roots_output *output) {
 	wl_list_remove(&output->damage_frame.link);
 	wl_list_remove(&output->damage_destroy.link);
 	wl_event_source_remove(output->repaint_timer);
+	wl_event_source_remove(output->frame_timer);
 	free(output);
 }
 
@@ -557,10 +558,33 @@ static int output_repaint_timer_handler(void *data) {
 	return 0;
 }
 
+static int output_frame_timer_handler(void *data) {
+	struct roots_output *output = data;
+
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
+
+	void surface_send_frame_done_iterator(struct roots_output *output,
+			struct wlr_surface *surface, struct wlr_box *box, float rotation,
+			void *data);
+
+	// Send frame done events to all surfaces
+	output_for_each_surface(output, surface_send_frame_done_iterator, &now);
+
+	return 0;
+}
+
 static void output_damage_handle_frame(struct wl_listener *listener,
 		void *data) {
 	struct roots_output *output =
 		wl_container_of(listener, output, damage_frame);
+
+	if (output->frame_delay_msec > 0)
+		wl_event_source_timer_update(output->frame_timer,
+				output->frame_delay_msec);
+	else if (output->frame_delay_msec < 0) {
+		output_frame_timer_handler(output);
+	}
 
 	if (output->repaint_delay_msec > 0) {
 		wl_event_source_timer_update(output->repaint_timer,
@@ -660,6 +684,8 @@ void handle_new_output(struct wl_listener *listener, void *data) {
 
 	output->repaint_timer = wl_event_loop_add_timer(server.wl_event_loop,
 			output_repaint_timer_handler, output);
+	output->frame_timer = wl_event_loop_add_timer(server.wl_event_loop,
+			output_frame_timer_handler, output);
 
 	struct roots_output_config *output_config =
 		roots_config_get_output(config, wlr_output);
@@ -689,6 +715,7 @@ void handle_new_output(struct wl_listener *listener, void *data) {
 				output_config->y);
 
 			output->repaint_delay_msec = output_config->repaint_delay_msec;
+			output->frame_delay_msec = output_config->frame_delay_msec;
 		} else {
 			wlr_output_enable(wlr_output, false);
 		}
