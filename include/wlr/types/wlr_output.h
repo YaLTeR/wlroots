@@ -149,6 +149,8 @@ struct wlr_output {
 	void *data;
 
 	struct weston_timeline_object timeline_object;
+
+	bool block_idle_frame;
 };
 
 struct wlr_output_event_precommit {

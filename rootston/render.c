@@ -423,6 +423,8 @@ send_frame_done:
 	// Send frame done events to all surfaces
 	output_for_each_surface(output, surface_send_frame_done_iterator, &now);
 
+	wlr_output->block_idle_frame = false;
+
 	TL_POINT("output_render after send frame", TLP_OUTPUT(wlr_output),
 			TLP_END);
 }

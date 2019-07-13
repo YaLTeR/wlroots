@@ -529,13 +529,14 @@ bool wlr_output_attach_buffer(struct wlr_output *output,
 
 void wlr_output_send_frame(struct wlr_output *output) {
 	output->frame_pending = false;
+	output->block_idle_frame = true;
 	wlr_signal_emit_safe(&output->events.frame, output);
 }
 
 static void schedule_frame_handle_idle_timer(void *data) {
 	struct wlr_output *output = data;
 	output->idle_frame = NULL;
-	if (!output->frame_pending && output->impl->schedule_frame) {
+	if (!output->frame_pending && output->impl->schedule_frame && !output->block_idle_frame) {
 		// Ask the backend to send a frame event when appropriate
 		if (output->impl->schedule_frame(output)) {
 			output->frame_pending = true;
